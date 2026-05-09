@@ -273,3 +273,72 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}")
     print(f"  Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
     print(f"  Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
+
+
+def train_and_evaluate(
+    model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+):
+    for epoch in range(num_epochs):
+        # Training phase
+        model.train()
+        running_loss = 0.0
+        correct = 0
+        total = 0
+
+        for inputs, labels in train_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+            _, predicted = torch.max(outputs.data, 1)
+
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+        train_loss = running_loss / len(train_loader)
+        train_acc = correct / total
+
+        # Validation phase
+        model.eval()
+        val_loss = 0.0
+        val_correct = 0
+        val_total = 0
+
+        with torch.no_grad():
+            for inputs, labels in val_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+
+                val_loss += loss.item()
+                _, predicted = torch.max(outputs.data, 1)
+                val_total += labels.size(0)
+                val_correct += (predicted == labels).sum().item()
+
+        val_loss /= len(val_loader)
+        val_acc = val_correct / val_total
+
+        print(f"Epoch {epoch+1}/{num_epochs}")
+        print(f"  Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
+        print(f"  Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
+
+
+def make_model(learning_rate=0.01):
+    model = ClothingClassifierMobileNet(num_classes=10)
+    model.to(device)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    return model, optimizer
+
+
+for lr in [0.001, 0.1]:
+    print("learning rate=", lr)
+    model, optimizer = make_model(lr)
+    train_and_evaluate(
+        model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+    )
