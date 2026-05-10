@@ -342,3 +342,49 @@ for lr in [0.001, 0.1]:
     train_and_evaluate(
         model, optimizer, train_loader, val_loader, criterion, num_epochs, device
     )
+
+
+class ClothingClassifierMobileNet(nn.Module):
+    def __init__(self, size_inner=100, num_classes=10):
+        super(ClothingClassifierMobileNet, self).__init__()
+
+        # Load pre-trained MobileNetV2
+        self.base_model = models.mobilenet_v2(weights="IMAGENET1K_V1")
+
+        # Freeze base model parameters
+        for param in self.base_model.parameters():
+            param.requires_grad = False
+
+        # Remove original classifier
+        self.base_model.classifier = nn.Identity()
+
+        # Add custom layers
+        self.global_avg_pooling = nn.AdaptiveAvgPool2d((1, 1))
+
+        self.inner = nn.Linear(1280, size_inner)  # New inner layer
+        self.relu = nn.ReLU()
+        self.output_layer = nn.Linear(size_inner, num_classes)
+
+    def forward(self, x):
+        x = self.base_model.features(x)
+        x = self.global_avg_pooling(x)
+        x = torch.flatten(x, 1)
+        x = self.inner(x)
+        x = self.relu(x)
+        x = self.output_layer(x)
+        return x
+
+
+def make_model(learning_rate=0.001, size_inner=100):
+    model = ClothingClassifierMobileNet(num_classes=10, size_inner=size_inner)
+    model.to(device)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    return model, optimizer
+
+
+for size_inner in [1000, 500, 100]:
+    print("learning rate=", lr)
+    model, optimizer = make_model(learning_rate=0.001, size_inner=size_inner)
+    train_and_evaluate(
+        model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+    )
