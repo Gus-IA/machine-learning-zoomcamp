@@ -332,7 +332,7 @@ def train_and_evaluate(
         # Checkpoint the model if validation accuracy improved
         if val_acc > best_val_accuracy:
             best_val_accuracy = val_acc
-            checkpoint_path = f"clothing_v2_{epoch+1:02d}_{val_acc:.3f}.pth"
+            checkpoint_path = f"clothing_v3_{epoch+1:02d}_{val_acc:.3f}.pth"
             torch.save(model.state_dict(), checkpoint_path)
             print(f"Checkpoint saved: {checkpoint_path}")
 
@@ -353,7 +353,7 @@ for lr in [0.001, 0.1]:
 
 
 class ClothingClassifierMobileNet(nn.Module):
-    def __init__(self, size_inner=100, num_classes=10):
+    def __init__(self, size_inner=100, droprate=0.2, num_classes=10):
         super(ClothingClassifierMobileNet, self).__init__()
 
         # Load pre-trained MobileNetV2
@@ -371,6 +371,7 @@ class ClothingClassifierMobileNet(nn.Module):
 
         self.inner = nn.Linear(1280, size_inner)  # New inner layer
         self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(droprate)  # Add dropout
         self.output_layer = nn.Linear(size_inner, num_classes)
 
     def forward(self, x):
@@ -379,20 +380,25 @@ class ClothingClassifierMobileNet(nn.Module):
         x = torch.flatten(x, 1)
         x = self.inner(x)
         x = self.relu(x)
+        x = self.dropout(x)  # Apply dropout
         x = self.output_layer(x)
         return x
 
 
-def make_model(learning_rate=0.001, size_inner=100):
-    model = ClothingClassifierMobileNet(num_classes=10, size_inner=size_inner)
+def make_model(learning_rate=0.001, size_inner=100, droprate=0.2):
+    model = ClothingClassifierMobileNet(
+        num_classes=10, size_inner=size_inner, droprate=droprate
+    )
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     return model, optimizer
 
 
-for size_inner in [1000, 500, 100]:
-    print("learning rate=", lr)
-    model, optimizer = make_model(learning_rate=0.001, size_inner=size_inner)
+num_epochs = 10
+
+for droprate in [0.1, 0.2, 0.5, 0.7]:
+    print("droprate=", droprate)
+    model, optimizer = make_model(learning_rate=0.001, droprate=droprate)
     train_and_evaluate(
         model, optimizer, train_loader, val_loader, criterion, num_epochs, device
     )
