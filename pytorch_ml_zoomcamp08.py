@@ -124,10 +124,12 @@ input_size = 224
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
 
-# Simple transforms - just resize and normalize
+# Training transforms WITH augmentation
 train_transforms = transforms.Compose(
     [
-        transforms.Resize((input_size, input_size)),
+        transforms.RandomRotation(10),  # Rotate up to 10 degrees
+        transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),  # Zoom
+        transforms.RandomHorizontalFlip(),  # Horizontal flip
         transforms.ToTensor(),
         transforms.Normalize(mean=mean, std=std),
     ]
@@ -332,7 +334,7 @@ def train_and_evaluate(
         # Checkpoint the model if validation accuracy improved
         if val_acc > best_val_accuracy:
             best_val_accuracy = val_acc
-            checkpoint_path = f"clothing_v3_{epoch+1:02d}_{val_acc:.3f}.pth"
+            checkpoint_path = f"clothing_v4_{epoch+1:02d}_{val_acc:.3f}.pth"
             torch.save(model.state_dict(), checkpoint_path)
             print(f"Checkpoint saved: {checkpoint_path}")
 
@@ -396,12 +398,11 @@ def make_model(learning_rate=0.001, size_inner=100, droprate=0.2):
 
 num_epochs = 10
 
-for droprate in [0.1, 0.2, 0.5, 0.7]:
-    print("droprate=", droprate)
-    model, optimizer = make_model(learning_rate=0.001, droprate=droprate)
-    train_and_evaluate(
-        model, optimizer, train_loader, val_loader, criterion, num_epochs, device
-    )
+model, optimizer = make_model(learning_rate=0.001, size_inner=100, droprate=0.2)
+
+train_and_evaluate(
+    model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+)
 
 
 size_inner = 100
