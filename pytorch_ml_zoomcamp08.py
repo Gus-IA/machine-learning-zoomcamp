@@ -1,3 +1,5 @@
+from glob import glob
+
 from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
@@ -7,7 +9,7 @@ subprocess.run(
     [
         "git",
         "clone",
-        "git clone https://github.com/alexeygrigorev/clothing-dataset-small.git",
+        "https://github.com/alexeygrigorev/clothing-dataset-small.git",
     ]
 )
 
@@ -414,4 +416,46 @@ model, optimizer = make_model(
 )
 train_and_evaluate(
     model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+)
+
+
+# Find best checkpoint
+list_of_files = glob("clothing_v4_*.pth")
+latest_file = max(list_of_files, key=os.path.getctime)
+print(f"Loading model from: {latest_file}")
+
+# Load model
+model = ClothingClassifierMobileNet(size_inner=100, droprate=0.2, num_classes=10)
+model.load_state_dict(torch.load(latest_file))
+model.to(device)
+model.eval()
+
+
+x = val_transforms(img)
+batch_t = torch.unsqueeze(x, 0).to(device)
+print(x.shape)
+
+# Make prediction
+with torch.no_grad():
+    output = model(batch_t)
+
+_, indices = torch.sort(output, descending=True)
+print(output)
+
+print(train_dataset.class_to_idx)
+
+# Create dummy input
+dummy_input = torch.randn(1, 3, 224, 224).to(device)
+
+# Export to ONNX
+onnx_path = "clothing_classifier_mobilenet_v2.onnx"
+
+torch.onnx.export(
+    model,
+    dummy_input,
+    onnx_path,
+    verbose=True,
+    input_names=["input"],
+    output_names=["output"],
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
 )
