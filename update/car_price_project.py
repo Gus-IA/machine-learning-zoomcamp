@@ -49,3 +49,40 @@ plt.show()
 
 # missing values
 print(df.isnull().sum())
+
+n = len(df)
+
+# separamos en validación, test y train
+n_val = int(n * 0.2)
+n_test = int(n * 0.2)
+n_train = n - n_val - n_test
+
+print(n_val, n_test, n_train)
+
+df_val = df.iloc[n_train : n_train + n_val]
+print(df_val)
+df_test = df.iloc[n_val : n_val + n_test]
+print(df_test)
+df_train = df.iloc[n_train:]
+print(df_train)
+
+# mezclamos porque pueden estar ordenados..
+idx = np.arange(n)
+
+np.random.shuffle(idx)
+
+print(idx)
+
+# lo aplicamos y comprobamos
+df_val = df.iloc[idx[n_train : n_train + n_val]]
+print(df_val)
+df_test = df.iloc[idx[n_val : n_val + n_test]]
+print(df_test)
+df_train = df.iloc[idx[n_train:]]
+print(df_train)
+
+print(len(df_train), len(df_val), len(df_test))
+
+df_train = df_train.reset_index(drop=True)
+df_val = df_val.reset_index(drop=True)
+df_test = df_test.reset_index(drop=True)
