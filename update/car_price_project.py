@@ -86,3 +86,29 @@ print(len(df_train), len(df_val), len(df_test))
 df_train = df_train.reset_index(drop=True)
 df_val = df_val.reset_index(drop=True)
 df_test = df_test.reset_index(drop=True)
+
+
+# linear regression
+
+print(df_train.iloc[10])
+
+xi = [453, 11, 86]
+
+w0 = 7.17
+w = [0.01, 0.04, 0.002]
+
+
+def linear_regression(xi):
+    n = len(xi)
+
+    pred = w0
+
+    for j in range(n):
+        pred = pred + w[j] * xi[j]
+
+    return pred
+
+
+print(linear_regression(xi))
+
+np.exp(12.312)
