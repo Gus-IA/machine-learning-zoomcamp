@@ -112,3 +112,54 @@ def linear_regression(xi):
 print(linear_regression(xi))
 
 np.exp(12.312)
+
+
+def dot(xi, w):
+    n = len(xi)
+
+    res = 0.0
+
+    for j in range(n):
+        res = res + xi[j] * w[j]
+
+    return res
+
+
+def linear_regression(xi):
+    return w0 + dot(xi, w)
+
+
+w_new = [w0] + w
+
+print(w_new)
+
+
+def linear_regression(xi):
+    xi = [1] + xi
+    return dot(xi, w_new)
+
+
+print(linear_regression(xi))
+
+
+xi = [453, 11, 86]
+
+w0 = 7.17
+w = [0.01, 0.04, 0.002]
+w_new = [w0] + w
+
+x1 = [1, 148, 24, 1385]
+x2 = [1, 132, 25, 2031]
+x10 = [1, 453, 1, 86]
+
+X = [x1, x2, x10]
+print(X)
+X = np.array(X)
+print(X)
+
+
+def linear_regression(X):
+    return X.dot(w_new)
+
+
+print(linear_regression(X))
