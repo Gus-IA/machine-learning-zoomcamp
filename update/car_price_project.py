@@ -163,3 +163,42 @@ def linear_regression(X):
 
 
 print(linear_regression(X))
+
+
+def train_linear_regression(X, y):
+    pass
+
+
+X = [
+    [1, 148, 24, 1385],
+    [1, 132, 25, 2031],
+    [1, 453, 1, 86],
+    [172, 25, 201],
+    [142, 31, 86],
+    [453, 31, 86],
+    [158, 25, 185],
+]
+
+X = np.column_stack([x1, x2, x10])
+
+ones = np.ones(X.shape[0])
+
+X = np.column_stack([ones, X])
+
+y = np.array([100, 200, 150, 250, 100, 200, 150, 250, 120])
+
+XTX = X.T.dot(X)
+XTX_inv = np.linalg.pinv(XTX)
+
+print("X:", X.shape)
+print("XTX:", XTX.shape)
+print("XTX_inv:", XTX_inv.shape)
+
+w_full = XTX_inv.dot(X.T).dot(y)
+
+print(w_full)
+
+w0 = w_full[0]
+w = w_full[1:]
+
+print(w0, w)
