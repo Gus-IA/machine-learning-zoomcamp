@@ -202,3 +202,20 @@ w0 = w_full[0]
 w = w_full[1:]
 
 print(w0, w)
+
+
+print(df_train.columns)
+
+base = ["engine_hp", "engine_cylinders", "highway_mpg", "city_mpg", "popularity"]
+
+X_train = df_train[base].values
+
+X_train = df_train[base].fillna(0).isnull().sum()
+
+w0, w = train_linear_regression(X_train)
+
+w_pred = w0 + X_train.dot(w)
+print(w_pred)
+
+sns.histplot(w_pred, color="red", alpha=0.5, bins=50)
+sns.histplot(X_train, color="blue", alpha=0.5, bins=50)
