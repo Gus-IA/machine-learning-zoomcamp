@@ -219,3 +219,11 @@ print(w_pred)
 
 sns.histplot(w_pred, color="red", alpha=0.5, bins=50)
 sns.histplot(X_train, color="blue", alpha=0.5, bins=50)
+
+
+# RMSE
+def rmse(y, y_pred):
+    error = y - y_pred
+    se = error**2
+    mse = se.mean()
+    return np.sqrt(mse)
