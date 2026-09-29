@@ -227,3 +227,31 @@ def rmse(y, y_pred):
     se = error**2
     mse = se.mean()
     return np.sqrt(mse)
+
+
+# validating the model
+base = ["engine_hp", "engine_cylinders", "highway_mpg", "city_mpg", "popularity"]
+
+X_train = df_train[base].values
+
+X_train = df_train[base].fillna(0).isnull().sum()
+
+w0, w = train_linear_regression(X_train)
+
+w_pred = w0 + X_train.dot(w)
+
+
+def prepare_X(df):
+    df_num = df[base]
+    df_num.fillna(0).values
+    X = df_num.values
+    return X
+
+
+X_train = prepare_X(df_train)
+w0, w = train_linear_regression(X_train)
+
+X_train = prepare_X(df_val)
+y_pred = w0 + X_train.dot(w)
+
+rmse(X_train, y_pred)
