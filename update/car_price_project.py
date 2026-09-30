@@ -255,3 +255,29 @@ X_train = prepare_X(df_val)
 y_pred = w0 + X_train.dot(w)
 
 rmse(X_train, y_pred)
+
+
+# feature engineering
+2017 - df_train.year
+
+
+def prepare_X(df):
+    df["age"] = 2017 - df_train.year
+    features = base + ["age"]
+
+    df_num = df[features]
+    df_num.fillna(0).values
+    X = df_num.values
+    return X
+
+
+X_train = prepare_X(df_train)
+w0, w = train_linear_regression(X_train)
+
+X_train = prepare_X(df_val)
+y_pred = w0 + X_train.dot(w)
+
+rmse(X_train, y_pred)
+
+sns.histplot(w_pred, color="red", alpha=0.5, bins=50)
+sns.histplot(X_train, color="blue", alpha=0.5, bins=50)
