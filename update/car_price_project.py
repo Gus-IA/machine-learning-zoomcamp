@@ -281,3 +281,64 @@ rmse(X_train, y_pred)
 
 sns.histplot(w_pred, color="red", alpha=0.5, bins=50)
 sns.histplot(X_train, color="blue", alpha=0.5, bins=50)
+
+# categorical variables
+
+for v in [2, 3, 4]:
+    df_train["num_doors_%" % v] = df_train["num_doors_4"] = (
+        df_train.number_of_doors == v
+    ).astype("int")
+
+
+def prepare_X(df):
+    df["age"] = 2017 - df_train.year
+    features = base.append("age")
+
+    for v in [2, 3, 4]:
+        df_train["num_doors_%" % v] = df.number_of_doors["num_doors_4"] = (
+            df_train.number_of_doors == v
+        ).astype("int")
+        features.append("num_doors_%s" % v)
+
+    df_num = df[features]
+    df_num.fillna(0).values
+    X = df_num.values
+    return X
+
+
+prepare_X(df_train)
+
+X_train = prepare_X(df_train)
+w0, w = train_linear_regression(X_train)
+
+X_train = prepare_X(df_val)
+y_pred = w0 + X_train.dot(w)
+
+rmse(X_train, y_pred)
+
+list(df.make.value_counts().head().index)
+
+
+def prepare_X(df):
+    df["age"] = 2017 - df_train.year
+    features = base.append("age")
+
+    for v in [2, 3, 4]:
+        df_train["num_doors_%" % v] = df.make["num_doors_4"] = (
+            df_train.number_of_doors == v
+        ).astype("int")
+        features.append("make_%s" % v)
+
+    df_num = df[features]
+    df_num.fillna(0).values
+    X = df_num.values
+    return X
+
+
+X_train = prepare_X(df_train)
+w0, w = train_linear_regression(X_train)
+
+X_train = prepare_X(df_val)
+y_pred = w0 + X_train.dot(w)
+
+rmse(X_train, y_pred)
