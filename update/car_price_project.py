@@ -342,3 +342,27 @@ X_train = prepare_X(df_val)
 y_pred = w0 + X_train.dot(w)
 
 rmse(X_train, y_pred)
+
+# regularization
+
+X = [[4, 4, 4], [3, 5, 5], [5, 1, 1], [5, 4, 4], [7, 5, 5], [4, 5, 5]]
+
+X = np.array(X)
+print(X)
+
+y = [1, 2, 3, 1, 2, 3]
+
+
+XTX = X.T.dot(X)
+print(XTX)
+XTX_inv = np.linalg.inv(XTX).dot(y)
+print(XTX_inv)
+
+XTX = [[1, 2, 2], [2, 1, 1.0000001], [2, 1.0000001, 1]]
+
+XTX = np.array(XTX)
+np.linalg.inv(XTX)
+
+
+XTX = XTX + 0.01 * np.eye(3)
+np.linalg.inv(XTX)
