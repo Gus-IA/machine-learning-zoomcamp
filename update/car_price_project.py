@@ -366,3 +366,28 @@ np.linalg.inv(XTX)
 
 XTX = XTX + 0.01 * np.eye(3)
 np.linalg.inv(XTX)
+
+
+def train_linear_regression_reg(X, y, r=0.001):
+    ones = np.ones(X.shape[0])
+    X = np.column_stack([ones, X])
+
+    XTX = X.T.dot(X)
+    XTX = XTX + r * np.eye(XTX.shape[0])
+
+    XTX_inv = np.linalg.inv(XTX)
+    w_full = XTX_inv.dot(X.T).dot(y)
+
+    return w_full[0], w_full[1:]
+
+
+# tuning the model
+for r in [0.0, 0.00001, 0.0001, 0.001, 0.1, 1, 10]:
+    X_train = prepare_X(df_train)
+    w0, w = train_linear_regression_reg(X_train, y_train, r=r)
+
+    X_val = prepare_X(df_val)
+    y_pred = w0 + X_val.dot(w)
+    score = rmse(y_val, y_pred)
+
+    print(r, w0, score)
