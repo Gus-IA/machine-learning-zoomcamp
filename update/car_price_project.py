@@ -391,3 +391,43 @@ for r in [0.0, 0.00001, 0.0001, 0.001, 0.1, 1, 10]:
     score = rmse(y_val, y_pred)
 
     print(r, w0, score)
+
+# Using the model
+df_full_train = pd.concat([df_train, df_val])
+print(df_full_train)
+
+df_full_train = df_full_train.reset_index(drop=True)
+
+X_full_train = prepare_X(df_full_train)
+
+print(X_full_train)
+
+y_full_train = np.concatenate([y_train, y_val])
+print(y_full_train)
+
+w0, w = train_linear_regression_reg(X_full_train, y_full_train, r=0.001)
+print(w)
+
+X_test = prepare_X(df_test)
+y_pred = w0 + y_test.dot(w)
+score = rmse(y_test, y_pred)
+print(score)
+
+car = df_test.iloc[20].to_dict()
+print(car)
+
+df_small = pd.DataFrame([car])
+print(df_small)
+
+X_small = prepare_X(df_small)
+print(X_small)
+
+y_pred = w0 + X_small.dot(w)
+y_pred = y_pred[0]
+print(y_pred)
+
+np.expm1(y_pred)
+
+print(y_test[20])
+
+np.expm1(y_test[20])
