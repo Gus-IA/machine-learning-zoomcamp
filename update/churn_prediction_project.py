@@ -30,3 +30,19 @@ print(df.churn.head())
 (df.churn == "yes").astype(int).head()
 
 print(tc)
+
+from sklearn.model_selection import train_test_split
+
+df_full_train, df_test = train_test_split(df, test_size=0.2, random_state=1)
+
+df_train, df_val = train_test_split(df_full_train, test_size=0.25, random_state=1)
+
+print(len(df_train), len(df_val), len(df_test))
+
+df_train = df_train.reset_index(drop=True)
+df_val = df_val.reset_index(drop=True)
+df_test = df_test.reset_index(drop=True)
+
+y_train = df_train.churn.values
+y_val = df_val.churn.values
+y_test = df_test.churn.values
