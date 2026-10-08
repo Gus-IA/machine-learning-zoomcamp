@@ -46,3 +46,33 @@ df_test = df_test.reset_index(drop=True)
 y_train = df_train.churn.values
 y_val = df_val.churn.values
 y_test = df_test.churn.values
+
+# Exploratori and data analysis
+df_full_train = df_full_train.reset_index(drop=True)
+df_full_train.churn.value_counts(normalize=True)
+
+# global_churn_rate = df_full_train.churn.mean()
+# round(global_churn_rate, 2)
+
+numerical = ["tenure", "monthlycharges", "totalcharges"]
+
+categorical = [
+    "gender",
+    "seniorcitizen",
+    "partner",
+    "dependents",
+    "phoneservice",
+    "multiplelines",
+    "internetservice",
+    "onlinesecurity",
+    "onlinebackup",
+    "deviceprotection",
+    "techsupport",
+    "streamingtv",
+    "streamingmovies",
+    "contract",
+    "paperlessbilling",
+    "paymentmethod",
+]
+
+df_full_train[categorical].nunique()
