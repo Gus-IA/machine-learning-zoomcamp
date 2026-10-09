@@ -76,3 +76,42 @@ categorical = [
 ]
 
 df_full_train[categorical].nunique()
+
+# churn rate
+df_full_train.head()
+
+df_full_train["churn"] = (df_full_train["churn"] == "yes").astype(int)
+
+global_churn = df_full_train.churn.mean()
+print(global_churn)
+
+churn_female = df_full_train[df_full_train.gender == "female"].churn.mean()
+print(churn_female)
+
+churn_male = df_full_train[df_full_train.gender == "male"].churn.mean()
+print(churn_male)
+
+df_full_train.partner.value_counts()
+
+churn_partner = df_full_train[df_full_train.partner == "yes"].churn.mean()
+print(churn_partner)
+
+churn_no_partner = df_full_train[df_full_train.partner == "no"].churn.mean()
+print(churn_no_partner)
+
+print(global_churn - churn_partner)
+
+
+# risk ratio
+print(churn_no_partner / global_churn)
+
+print(churn_partner / global_churn)
+
+for c in categorical:
+    print(c)
+    df_group = df_full_train.groupby("gender").churn.agg(["mean", "count"])
+    df_group["diff"] = df_group["mean"] - global_churn
+    df_group["risk"] = df_group["mean"] / global_churn
+    print(df_group)
+    print()
+    print()
