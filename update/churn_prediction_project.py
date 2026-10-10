@@ -115,3 +115,19 @@ for c in categorical:
     print(df_group)
     print()
     print()
+
+# mutual information
+from sklearn.metrics import mutual_info_score
+
+mutual_score = mutual_info_score(df_full_train.churn, df_full_train.contract)
+
+print(mutual_score)
+
+
+def mutual_info_churn_score(series):
+    return mutual_info_score(series, df_full_train.churn)
+
+
+mi = df_full_train[categorical].apply(mutual_info_churn_score)
+mi.sort_values(ascending=False)
+print(mi)
