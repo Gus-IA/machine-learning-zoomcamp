@@ -131,3 +131,18 @@ def mutual_info_churn_score(series):
 mi = df_full_train[categorical].apply(mutual_info_churn_score)
 mi.sort_values(ascending=False)
 print(mi)
+
+# correlation
+
+df_tenure = df_full_train[df_full_train.tenure <= 2].churn.mean()
+print(df_tenure)
+
+df_tenure_month = df_full_train[df_full_train.tenure > 12].churn.mean()
+print(df_tenure_month)
+
+
+df_montly_charges = df_full_train[df_full_train.monthlycharges <= 20].churn.mean()
+print(df_montly_charges)
+
+df_montly_charges_month = df_full_train[df_full_train.monthlycharges > 50].churn.mean()
+print(df_montly_charges_month)
