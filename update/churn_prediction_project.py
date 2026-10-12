@@ -146,3 +146,19 @@ print(df_montly_charges)
 
 df_montly_charges_month = df_full_train[df_full_train.monthlycharges > 50].churn.mean()
 print(df_montly_charges_month)
+
+# One hot encoding
+from sklearn.feature_extraction import DictVectorizer
+
+df_gend_cont = (
+    df_train[["gender", "contract", "tenure"]].iloc[:10].to_dict(orient="records")
+)
+print(df_gend_cont)
+
+dv = DictVectorizer()
+
+dv.fit(df_gend_cont)
+
+dv.get_feature_names_out()
+
+dv.transform(df_gend_cont)
