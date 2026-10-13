@@ -162,3 +162,17 @@ dv.fit(df_gend_cont)
 dv.get_feature_names_out()
 
 dv.transform(df_gend_cont)
+
+# logistic regression
+
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+
+z = np.linspace(-7, 7, 51)
+print(z)
+
+sigmoid(z)
+
+plt.plot(z, sigmoid(z))
