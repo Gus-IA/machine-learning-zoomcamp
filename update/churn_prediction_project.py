@@ -176,3 +176,31 @@ print(z)
 sigmoid(z)
 
 plt.plot(z, sigmoid(z))
+
+# training logistic regresion with scikit-learn
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
+
+model.intercept_[0]
+
+model.coef_[0].round(3)
+
+y_pred = model.predict_proba(df_train)[:, 1]
+
+churn_decision = y_pred >= 0.5
+
+df_val[churn_decision].customerid
+
+(y_val == churn_decision).mean()
+
+df_pred = pd.DataFrame()
+df_pred["probability"] = y_pred
+df_pred["prediction"] = churn_decision.astype(int)
+df_pred["actual"] = y_val
+
+df_pred["correct"] = df_pred.prediction == df_pred.actual
+
+df_pred.correct.astype("int").mean()
+
+churn_decision.astype(int)
