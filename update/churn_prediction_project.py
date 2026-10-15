@@ -204,3 +204,33 @@ df_pred["correct"] = df_pred.prediction == df_pred.actual
 df_pred.correct.astype("int").mean()
 
 churn_decision.astype(int)
+
+# model interpretation
+dict(zip(dv.get_feature_names(), model.coef_[0].round(3)))
+
+small = ["contract", "tenure", "monthlycharges"]
+
+print(df_train[small].iloc[:10].to_dict(orient="records"))
+
+dicts_train_small = df_train[small].iloc[:10].to_dict(orient="records")
+dicts_val_small = df_val[small].iloc[:10].to_dict(orient="records")
+
+dv_small = DictVectorizer(sparse=False)
+dv_small.fit(dicts_train_small)
+
+dv_small.get_feature_names()
+
+X_train_small = dv_small.trainsform(dicts_train_small)
+
+model_small = LogisticRegression()
+model_small.fit(X_train_small, y_train)
+
+w0 = model_small.intercept_[0]
+print(w0)
+
+w = model_small.coef_[0]
+w.round(3)
+
+dict(zip(dv.small.get_feature_names(), w.round(3)))
+
+print(sigmoid(-2.47 + 0.97 + 60 * 0.027 + 1 * (-0.036)))
