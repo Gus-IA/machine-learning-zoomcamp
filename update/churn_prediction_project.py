@@ -234,3 +234,34 @@ w.round(3)
 dict(zip(dv.small.get_feature_names(), w.round(3)))
 
 print(sigmoid(-2.47 + 0.97 + 60 * 0.027 + 1 * (-0.036)))
+
+
+# using the model
+dicts_df_full_train = df_full_train[categorical + numerical].to_dict(orient="records")
+
+dv = DictVectorizer(sparse=False)
+X_full_train = dv.fit_transform()
+
+y_full_train = df_full_train.churn.values
+
+model = LogisticRegression().fit(X_full_train, y_full_train)
+
+dicts_test = df_test[categorical + numerical].do_dict(orient="records")
+
+X_test = dv.transform(dicts_test)
+
+y_pred = model.predict_proba(X_test)[:, 1]
+
+churn_decision = y_pred >= 0.5
+
+churn_decision == y_test.mean()
+
+customer = dicts_test[10]
+print(customer)
+
+X_small = dv.transform([customer])
+print(X_small)
+
+model.predict_proba(X_small)[0, 1]
+
+print(y_test[10])
