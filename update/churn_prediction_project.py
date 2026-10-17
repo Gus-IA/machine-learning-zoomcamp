@@ -265,3 +265,34 @@ print(X_small)
 model.predict_proba(X_small)[0, 1]
 
 print(y_test[10])
+
+
+# evaluation metrics
+print(len(y_val))
+
+(y_val == churn_decision).mean()
+
+from sklearn.metrics import accuracy_score
+
+accuracy_score(y_val, churn_decision)
+print(accuracy_score)
+
+thresholds = np.linspace(0, 1, 21)
+print(thresholds)
+
+scores = []
+
+for t in thresholds:
+    accuracy_score(y_val, y_pred >= t)
+    churn_decision = y_pred >= t
+    score = (y_val == churn_decision).mean()
+    scores.append(score)
+
+print(scores)
+plt.plot(thresholds, scores)
+
+from collections import Counter
+
+Counter(y_pred >= 1.0)
+
+print(Counter(y_val))
