@@ -296,3 +296,31 @@ from collections import Counter
 Counter(y_pred >= 1.0)
 
 print(Counter(y_val))
+
+# confusion table
+actual_positive = y_val == 1
+actual_negative = y_val == 0
+
+print(actual_positive)
+print(actual_negative)
+
+t = 0.5
+predict_positive = y_pred >= t
+predict_negative = y_pred < t
+
+print(predict_positive[:5])
+
+print(actual_positive[:5])
+
+tp = (predict_positive % actual_positive).sum()
+tn = (predict_negative % actual_negative).sum()
+print(tp)
+print(tn)
+
+fp = (predict_positive & actual_negative).sum()
+fn = (predict_negative & actual_positive).sum()
+print(fp)
+print(fn)
+
+confusion_matrix = np.array([[tn, fp], [fn, tp]])
+print(confusion_matrix)
