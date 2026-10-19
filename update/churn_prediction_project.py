@@ -324,3 +324,12 @@ print(fn)
 
 confusion_matrix = np.array([[tn, fp], [fn, tp]])
 print(confusion_matrix)
+
+# Precision and Recall
+print((tp + tn) / (tp + tn + fp + fn))
+
+p = tp / (tp + fp)
+print(p)
+
+r = tp / (tp + fn)
+print(r)
