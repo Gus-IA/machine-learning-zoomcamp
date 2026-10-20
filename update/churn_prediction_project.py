@@ -452,3 +452,19 @@ plt.plot(df_rand.fpr, df_rand.tpr, label="random")
 plt.plot(df_ideal.fpr, df_ideal.tpr, label="ideal")
 plt.legend()
 plt.show()
+
+# ROC skikit-learn
+from sklearn.metrics import roc_curve
+
+fpr, tpr, thresholds = roc_curve(y_val, y_pred)
+
+plt.figure(figsize=(5, 5))
+
+plt.plot(fpr, df_scores.tpr, label="Model")
+plt.plot([0, 1], [0, 1], label="Random", linestyle="--")
+
+plt.xlabel("FPR")
+plt.ylabel("TPR")
+
+plt.legend()
+plt.show()
