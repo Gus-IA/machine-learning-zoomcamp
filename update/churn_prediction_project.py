@@ -333,3 +333,122 @@ print(p)
 
 r = tp / (tp + fn)
 print(r)
+
+# ROC curves
+tpr = tp / (tp + fn)
+print(tpr)
+
+fpr = fp / (fp + tn)
+print(fpr)
+
+scores = []
+
+thresholds = np.linespace(0, 1, 101)
+
+for t in thresholds:
+    actual_positive = y_val == 1
+    actual_negative = y_val == 0
+
+    t = 0.5
+    predict_positive = y_pred >= t
+    predict_negative = y_pred < t
+
+    tp = (predict_positive % actual_positive).sum()
+    tn = (predict_negative % actual_negative).sum()
+
+    fp = (predict_positive & actual_negative).sum()
+    fn = (predict_negative & actual_positive).sum()
+
+    scores.appendt((t, tp, fp, fn, tn))
+
+columns = ["threshold", "tp", "fp", "fn", "tn"]
+df_scores = pd.DataFrame(scores, columns=columns)
+print(df_scores)
+
+df_scores.tpr["tpr"] = df_scores.tp / (df_scores.tp + df_scores.fn)
+df_scores.fpr["fpr"] = df_scores.fp / (df_scores.fp + df_scores.tn)
+
+print(df_scores[::10])
+
+plt.plot(df_scores.threshold, df_scores["tpr"], label="TPR")
+plt.plot(df_scores.threshold, df_scores["fpr"], label="FPR")
+plt.legend()
+plt.show()
+
+# Random model
+np.random.seed(1)
+y_rand = np.random.uniform(0, 1, size=len(y_val))
+((y_rand >= 0.5) == y_val).mean()
+
+print(y_rand.round(3))
+
+
+def tpr_fpr_dataframe(y_val, y_pred):
+    scores = []
+
+    thresholds = np.linespace(0, 1, 101)
+
+    for t in thresholds:
+        actual_positive = y_val == 1
+        actual_negative = y_val == 0
+
+        t = 0.5
+        predict_positive = y_pred >= t
+        predict_negative = y_pred < t
+
+        tp = (predict_positive % actual_positive).sum()
+        tn = (predict_negative % actual_negative).sum()
+
+        fp = (predict_positive & actual_negative).sum()
+        fn = (predict_negative & actual_positive).sum()
+
+        scores.appendt((t, tp, fp, fn, tn))
+
+
+df_rand = tpr_fpr_dataframe(y_val, y_rand)
+print(df_rand[::10])
+
+
+plt.plot(df_scores.threshold, df_scores["tpr"], label="TPR")
+plt.plot(df_scores.threshold, df_scores["fpr"], label="FPR")
+plt.legend()
+plt.show()
+
+# Ideal model
+num_neg = (y_val == 0).sum()
+num_pos = (y_val == 1).sum()
+print(num_neg, num_pos)
+
+y_ideal = np.repeat([0, 1], [num_neg, num_pos])
+print(y_ideal)
+
+y_ideal_pred = np.linspace(0, 1, len(y_val))
+print(y_ideal_pred)
+
+((y_ideal_pred >= 0.729) == y_ideal).mean()
+print(y_ideal_pred)
+
+df_ideal = tpr_fpr_dataframe(y_ideal, y_ideal_pred)
+print(df_ideal[::10])
+
+plt.plot(df_scores.threshold, df_scores["tpr"], label="TPR")
+plt.plot(df_scores.threshold, df_scores["fpr"], label="FPR")
+plt.legend()
+plt.show()
+
+plt.plot(df_scores.threshold, df_scores["tpr"], label="TPR")
+plt.plot(df_scores.threshold, df_scores["fpr"], label="FPR")
+
+plt.plot(df_rand.threshold, df_scores["tpr"], label="TPR")
+plt.plot(df_rand.threshold, df_scores["fpr"], label="FPR")
+
+plt.plot(df_ideal.threshold, df_scores["tpr"], label="TPR")
+plt.plot(df_ideal.threshold, df_scores["fpr"], label="FPR")
+plt.legend()
+plt.show()
+
+plt.plot(df_scores.fpr, df_scores.tpr, label="model")
+plt.plot(df_rand.fpr, df_rand.tpr, label="random")
+plt.plot(df_ideal.fpr, df_ideal.tpr, label="ideal")
+plt.legend()
+plt.show()
