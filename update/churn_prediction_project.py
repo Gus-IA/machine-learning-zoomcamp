@@ -468,3 +468,45 @@ plt.ylabel("TPR")
 
 plt.legend()
 plt.show()
+
+
+# ROC AUC
+
+from sklearn.metrics import auc
+
+print(auc(fpr, tpr))
+
+print(auc(df_scores.fpr, df_scores.tpr))
+
+print(auc(df_ideal.fpr, df_ideal.tpr))
+
+fpr, tpr, thresholds = roc_curve(y_val, y_pred)
+auc(df_scores.fpr, df_scores.tpr)
+
+from sklearn.metrics import roc_auc_score
+
+print(roc_auc_score(y_val, y_pred))
+
+neg = y_pred[y_val == 0]
+pos = y_pred[y_val == 1]
+
+print(pos)
+
+import random
+
+n = 1000
+success = 0
+
+for i in range(n):
+    pos_ind = random.randint(0, len(pos), -1)
+    neg_ind = random.randint(0, len(neg), -1)
+
+    if pos[pos_ind] > neg[neg_ind]:
+        success = success + 1
+
+print(success / n)
+
+pos_ind = np.random.randint(0, len(pos), size=n)
+neg_ind = np.random.randint(0, len(neg), size=n)
+
+print(pos_ind, neg_ind)
