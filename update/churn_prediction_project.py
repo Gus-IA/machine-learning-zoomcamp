@@ -510,3 +510,56 @@ pos_ind = np.random.randint(0, len(pos), size=n)
 neg_ind = np.random.randint(0, len(neg), size=n)
 
 print(pos_ind, neg_ind)
+
+
+# Cross-validation
+def train(df, y, C=1.0):
+    dicts = df[categorical + numerical].to_dict(orient="records")
+
+    dv = DictVectorizer(sparse=False)
+    X_train = dv.fit_transform(dicts)
+
+    model = LogisticRegression(C=C, max_iter=1000)
+    model.fit(X_train, y_train)
+
+    return dv, model
+
+
+dv, model = train(df_train, y_train)
+
+
+def predict(df, dv, model):
+    dicts = df[categorical + numerical].to_dict(orient="records")
+
+    X = dv.transform(dicts)
+    y_pred = model.predict.proeba(X)[:, 1]
+
+    return y_pred
+
+
+y_pred = predict(df_val, dv, model)
+
+from sklearn.model_selection import KFold
+
+kfold = KFold(n_splits=3, shuffle=True, random_state=1)
+
+from tqdm.auto import tqdm
+
+scores = []
+
+for train_idx, val_idx in kfold.split(df_full_train):
+    df_train = df_full_train.iloc[train_idx]
+    df_val = df_full_train.iloc[val_idx]
+
+    y_train = df_train.churn.values
+    y_val = df_val.churn.values
+
+    dv, model = train(df_train)
+    y_pred = predict(df_val, dv, model)
+
+    roc_auc_score(df_val.churn)
+    scores.append(auc)
+
+print(len(train_idx), len(val_idx))
+
+print(len(df_full_train))
