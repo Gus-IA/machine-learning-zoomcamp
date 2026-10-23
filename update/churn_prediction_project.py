@@ -545,21 +545,43 @@ kfold = KFold(n_splits=3, shuffle=True, random_state=1)
 
 from tqdm.auto import tqdm
 
-scores = []
+n_splits = 5
 
-for train_idx, val_idx in kfold.split(df_full_train):
-    df_train = df_full_train.iloc[train_idx]
-    df_val = df_full_train.iloc[val_idx]
+for C in tqdm([0.001, 0.01, 0.1, 0.5, 1, 5, 10]):
+    kfold = KFold(n_splits=n_splits, shuffle=True, random_state=1)
 
-    y_train = df_train.churn.values
-    y_val = df_val.churn.values
+    scores = []
 
-    dv, model = train(df_train)
-    y_pred = predict(df_val, dv, model)
+    for train_idx, val_idx in kfold.split(df_full_train):
+        df_train = df_full_train.iloc[train_idx]
+        df_val = df_full_train.iloc[val_idx]
 
-    roc_auc_score(df_val.churn)
-    scores.append(auc)
+        y_train = df_train.churn.values
+        y_val = df_val.churn.values
 
-print(len(train_idx), len(val_idx))
+        dv, model = train(df_train)
+        y_pred = predict(df_val, dv, model)
 
-print(len(df_full_train))
+        roc_auc_score(df_val.churn)
+        scores.append(auc)
+
+    print(len(train_idx), len(val_idx))
+
+    print(len(df_full_train))
+
+# saving and loading the model
+
+# save model
+import pickle
+
+output_file = f"model_C={C}.bin"
+
+with open(output_file, "wb") as f_out:
+    pickle.dump((dv, model), f_out)
+
+
+# load model
+import pickle
+
+with open("model_C=1.0.bin", "rb") as f_in:
+    dv, model = pickle.load(f_in)
