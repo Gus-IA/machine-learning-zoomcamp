@@ -83,3 +83,57 @@ del df_val["status"]
 del df_test["status"]
 
 print(df_train)
+
+
+# decision trees
+def assess_risk(client):
+    if client["records"] == "yes":
+        if client["job"] == "parttime":
+            return "default"
+        else:
+            if client["assets"] > 6000:
+                return "ok"
+            else:
+                return "default"
+
+
+xi = df_train.iloc[0].to_dict()
+
+assess_risk(xi)
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.feature_extraction import DictVectorizer
+from sklearn.metrics import roc_auc_score
+
+train_dicts = df_train.to_dict(orient="records")
+dv = DictVectorizer(sparse=False)
+X_train = dv.fit_transform(train_dicts)
+
+print(dv.get_feature_names_out())
+
+dt = DecisionTreeClassifier()
+dt.fit(X_train, y_train)
+
+val_dicts = df_val.fillna(0).to_dict(orient="records")
+X_val = dv.transform(val_dicts)
+
+y_pred = dt.predict_proba(X_val)[:, 1]
+roc_auc_score(y_val, y_pred)
+
+y_pred = dt.predict_proba(X_train)[:, 1]
+roc_auc_score(y_val, y_pred)
+
+dt = DecisionTreeClassifier(max_depth=3)
+dt.fit(X_train, y_train)
+
+y_pred = dt.predict_proba(X_val)[:, 1]
+auc = roc_auc_score(y_train, y_pred)
+print("train:", auc)
+
+y_pred = dt.predict_proba(X_train)[:, 1]
+roc_auc_score(y_val, y_pred)
+print("val:", auc)
+
+from sklearn.tree import export_text
+
+print(export_text(dt, feature_names=dv.get_feature_names_out()))
