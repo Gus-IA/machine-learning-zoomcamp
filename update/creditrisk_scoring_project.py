@@ -137,3 +137,64 @@ print("val:", auc)
 from sklearn.tree import export_text
 
 print(export_text(dt, feature_names=dv.get_feature_names_out()))
+
+# decision tree learning algorith
+data = [
+    [8000, "default"],
+    [2000, "default"],
+    [0, "default"],
+    [5000, "ok"],
+    [5000, "ok"],
+    [4000, "ok"],
+    [9000, "ok"],
+    [3000, "default"],
+]
+
+df_example = pd.DataFrame(data, columns=["assets", "status"])
+print(df_example)
+
+print(df_example.sort_values("assets"))
+
+Ts = [2000, 3000, 4000, 5000, 8000]
+
+from Ipython.display import display
+
+for T in Ts:
+    df_left = df_example[df_example.assets <= T]
+    df_right = df_example[df_example.assets > T]
+
+    display(df_left)
+    print(df_left.status.value_counts(normalize=True))
+    display(df_right)
+    print(df_left.status.value_counts(normalize=True))
+
+    print()
+
+data = [
+    [8000, 3000, "default"],
+    [2000, 1000, "default"],
+    [0, 1000, "default"],
+    [5000, 1000, "ok"],
+    [5000, 1000, "ok"],
+    [4000, 1000, "ok"],
+    [9000, 500, "ok"],
+    [3000, 2000, "default"],
+]
+
+thresholds = {"assets": [0, 2000, 3000, 4000, 5000, 8000], "debt": [500, 1000, 2000]}
+
+for feature, Ts in thresholds.items():
+    print("###########################")
+    print(feature)
+    for T in Ts:
+        print(T)
+        df_left = df_example[df_example[feature] <= T]
+        df_right = df_example[df_example[feature] > T]
+
+        display(df_left)
+        print(df_left.status.value_counts(normalize=True))
+        display(df_right)
+        print(df_right.status.value_counts(normalize=True))
+
+        print()
+    print("###########################")
