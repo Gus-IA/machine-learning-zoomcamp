@@ -198,3 +198,36 @@ for feature, Ts in thresholds.items():
 
         print()
     print("###########################")
+
+# decision tree parameter tuning
+
+for d in [1, 2, 3, 4, 5, 6, 10, 15, 20, None]:
+    dt = DecisionTreeClassifier(max_depth=d)
+    dt.fit(X_train, y_train)
+
+    y_pred = dt.predict_proba(X_val)[:, 1]
+    auc = roc_auc_score(y_val, y_pred)
+
+    print("%4s -> %.3f" % (d, auc))
+
+scores = []
+
+for d in [4, 5, 6]:
+    for s in [1, 2, 5, 10, 15, 20, 100, 200, 500]:
+        dt = DecisionTreeClassifier(max_depth=d, min_samples_leaf=s)
+        dt.fit(X_train, y_train)
+
+        y_pred = dt.predict_proba(X_val)[:, 1]
+        auc = roc_auc_score(y_val, y_pred)
+
+        scores.append((d, s, auc))
+
+columns = ["max_depth", "min_samples_leaf", "auc"]
+df_scores = pd.DataFrame(scores, columns=columns)
+scores.head()
+
+df_scores.sort_values(by="auc", ascending=False).head()
+
+df_scores_pivot = df_scores.pivot(index="min_samples_leaf", columns=["max_depth"])
+
+sns.heatmap(df_scores_pivot, annot=True, fmt=".3f")
