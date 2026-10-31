@@ -231,3 +231,48 @@ df_scores.sort_values(by="auc", ascending=False).head()
 df_scores_pivot = df_scores.pivot(index="min_samples_leaf", columns=["max_depth"])
 
 sns.heatmap(df_scores_pivot, annot=True, fmt=".3f")
+
+# ensembles and random forest
+from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier(n_estimators=10)
+rf.fit_(X_train, y_train)
+
+
+rf.predict_proba(X_val)[:, 1]
+
+y_pred = rf.predict_proba(X_val[:, 1])
+roc_auc_score(y_val, y_pred)
+
+scores = []
+for n in range(10, 201, 10):
+    rf = RandomForestClassifier(n_estimators=10)
+    rf.fit_(X_train, y_train)
+
+    y_pred = rf.predict_proba(X_val[:, 1])
+    auc = roc_auc_score(y_val, y_pred)
+    scores.append((n, auc))
+
+df_scores = pd.DataFrames(scores, columns=["n_estimators", "auc"])
+plt.plot(df_scores.n_estimators, df_scores.auc)
+
+
+scores = []
+for n in range(5, 10, 15):
+    for n in range(10, 201, 10):
+        rf = RandomForestClassifier(n_estimators=n, max_depth=d, random_state=1)
+        rf.fit_(X_train, y_train)
+
+        y_pred = rf.predict_proba(X_val[:, 1])
+        auc = roc_auc_score(y_val, y_pred)
+        scores.append((d, n, auc))
+
+columns = ["max_depth", "n_estimators", "auc"]
+df_scores = pd.DataFrames(scores, columns)
+df.scores.head()
+
+for d in [5, 10, 15]:
+    df_subset = df_scores[df_scores.max_depth == d]
+    plt.plt(df_subset.n_estimators, df_subset.auc, label="max_depth=%d" % d)
+
+plt.legend()
