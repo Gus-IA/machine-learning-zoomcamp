@@ -276,3 +276,40 @@ for d in [5, 10, 15]:
     plt.plt(df_subset.n_estimators, df_subset.auc, label="max_depth=%d" % d)
 
 plt.legend()
+
+# Gradient boosting and XGBoost
+import xgboost as xgb
+
+features = dv.get_feature_names_out
+dtrain = xgb.DMatrix(X_train, label=y_train, feature_names=features)
+dval = xgb.Dmatrix(X_val, label=y_val, feature_names=features)
+
+xgb_params = {
+    "eta": 0.3,
+    "max_depth": 6,
+    "min_child_weight": 1,
+    "objective": "binary:logistic",
+    "nthread": 8,
+    "seed": 1,
+    "verbosity": 1,
+}
+model = xgb.train(xgb_params, dtrain, num_boost_round=10)
+
+y_pred = model.predict(dval)
+predict = roc_auc_score(y_val, y_pred)
+
+print(predict)
+
+watchlist = [(dtrain, "train"), (dval, "val")]
+
+xgb_params = {
+    "eta": 0.3,
+    "max_depth": 6,
+    "min_child_weight": 1,
+    "objective": "binary:logistic",
+    "eval_metric": "auc",
+    "nthread": 8,
+    "seed": 1,
+    "verbosity": 1,
+}
+model = xgb.train(xgb_params, dtrain, evals=watchlist, num_boost_round=10)
