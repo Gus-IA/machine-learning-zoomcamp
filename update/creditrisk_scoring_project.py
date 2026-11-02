@@ -313,3 +313,18 @@ xgb_params = {
     "verbosity": 1,
 }
 model = xgb.train(xgb_params, dtrain, evals=watchlist, num_boost_round=10)
+
+# XGBoost parameter tuning
+scores = {}
+key = "eta=%s" % (xgb_params["eta"])
+
+scores["eta=0.1"]
+
+print(scores.keys())
+
+etas = ["eta=1.0", "eta=0.3", "eta=0.1"]
+
+for eta in etas:
+    df_score = scores[eta]
+    plt.plot(df_scores.num_iter, df_scores.val_auc, label=key)
+plt.legend()
