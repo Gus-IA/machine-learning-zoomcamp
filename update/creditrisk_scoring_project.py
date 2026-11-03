@@ -328,3 +328,56 @@ for eta in etas:
     df_score = scores[eta]
     plt.plot(df_scores.num_iter, df_scores.val_auc, label=key)
 plt.legend()
+
+# Selecting the best model
+dt = DecisionTreeClassifier(max_depth=6, min_samples_leaf=15)
+dt.fit(X_train, y_train)
+
+rf = RandomForestClassifier(
+    n_estimators=200, max_depth=10, min_samples_leaf=3, random_state=1
+)
+rf.fit(X_train, y_train)
+
+xgb_params = {
+    "eta": 0.1,
+    "max_depth": 3,
+    "min_child_weight": 1,
+    "objective": "binary:logistic",
+    "eval_metric": "auc",
+    "ntread": 8,
+    "seed": 1,
+    "verbosity": 1,
+}
+
+model = xgb.train(xgb_params, dtrain, num_boost_round=175)
+
+y_pred = model.predict(dval)
+roc_auc_score(y_val, y_pred)
+
+df_full_train = df_full_train.reset_index(drop=True)
+y_full_train = (df_full_train.status == "default").astype(int).values
+
+dicts_test = df_test.to_dict(orient="records")
+X_test = dv.transform(dicts_test)
+
+dtest = xgb.DMatrix(
+    X_full_train, label=y_full_train, feature_names=dv.get_feature_names_out()
+)
+
+dtest = xgb.DMatrix(X_test, feature_names=dv.get_feature_names())
+
+xgb_params = {
+    "eta": 0.1,
+    "max_depth": 3,
+    "min_child_weight": 1,
+    "objective": "binary:logistic",
+    "eval_metric": "auc",
+    "ntread": 8,
+    "seed": 1,
+    "verbosity": 1,
+}
+
+model = xgb.train(xgb_params, dtrain, num_boost_round=175)
+
+y_pred = model.predict(dtest)
+roc_auc_score(y_test, y_pred)
