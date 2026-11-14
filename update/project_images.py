@@ -47,9 +47,34 @@ print("Imagen seleccionada:", ruta_imagen)
 img = Image.open(ruta_imagen)
 
 # 6. Redimensionar
-img = img.resize((64, 64))
+img = img.resize((224, 224))
 
 # 7. Convertir a array numpy
 x = np.array(img)
 
 print("Dimensiones:", x.shape)
+
+# pytorch
+import torchvision.models as models
+from torchvision import transforms
+
+model = models.mobilenet_v2(weights="IMAGENET1K_V1")
+model.eval()
+
+preprocess = transforms.Compose(
+    [
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ]
+)
+
+x = preprocess(img)
+
+batch_t = torch.unsqueeze(x, 0)
+
+with torch.no_grad():
+    output = model(batch_t)
+
+_, indices = torch.sort(output, descending=True)
