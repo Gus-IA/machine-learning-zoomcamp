@@ -171,3 +171,32 @@ val_dataset = ClothingDataset(data_dir=str(val_path), transform=val_transforms)
 
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+
+import torch.nn as nn
+import torchvision.models as models
+
+
+class ClothingClassifierMobileNet(nn.Module):
+    def __init__(self, num_classes=10):
+        super(ClothingClassifierMobileNet, self).__init__()
+
+        # Load pre-trained MobileNetV2
+        self.base_model = models.mobilenet_v2(weights="IMAGENET1K_V1")
+
+        # Freeze base model parameters
+        for param in self.base_model.parameters():
+            param.requires_grad = False
+
+        # Remove original classifier
+        self.base_model.classifier = nn.Identity()
+
+        # Add custom layers
+        self.global_avg_pooling = nn.AdaptiveAvgPool2d((1, 1))
+        self.output_layer = nn.Linear(1280, num_classes)
+
+    def forward(self, x):
+        x = self.base_model.features(x)
+        x = self.global_avg_pooling(x)
+        x = torch.flatten(x, 1)
+        x = self.output_layer(x)
+        return x
