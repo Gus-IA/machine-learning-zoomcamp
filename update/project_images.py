@@ -216,70 +216,73 @@ criterion = nn.CrossEntropyLoss()
 # Training loop
 num_epochs = 10
 
-for epoch in range(num_epochs):
-    # Training phase
-    model.train()  # Set the model to training mode
-    running_loss = 0.0
-    correct = 0
-    total = 0
 
-    # Iterate over the training data
-    for inputs, labels in train_loader:
-        # Move data to the specified device (GPU or CPU)
-        inputs, labels = inputs.to(device), labels.to(device)
+def train_and_evaluate(
+    model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+):
+    for epoch in range(num_epochs):
+        # Training phase
+        model.train()
+        running_loss = 0.0
+        correct = 0
+        total = 0
 
-        # Zero the parameter gradients to prevent accumulation
-        optimizer.zero_grad()
-        # Forward pass
-        outputs = model(inputs)
-        # Calculate the loss
-        loss = criterion(outputs, labels)
-        # Backward pass and optimize
-        loss.backward()
-        optimizer.step()
-
-        # Accumulate training loss
-        running_loss += loss.item()
-        # Get predictions
-        _, predicted = torch.max(outputs.data, 1)
-        # Update total and correct predictions
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-
-    # Calculate average training loss and accuracy
-    train_loss = running_loss / len(train_loader)
-    train_acc = correct / total
-
-    # Validation phase
-    model.eval()  # Set the model to evaluation mode
-    val_loss = 0.0
-    val_correct = 0
-    val_total = 0
-
-    # Disable gradient calculation for validation
-    with torch.no_grad():
-        # Iterate over the validation data
-        for inputs, labels in val_loader:
-            # Move data to the specified device (GPU or CPU)
+        for inputs, labels in train_loader:
             inputs, labels = inputs.to(device), labels.to(device)
-            # Forward pass
+
+            optimizer.zero_grad()
             outputs = model(inputs)
-            # Calculate the loss
             loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
 
-            # Accumulate validation loss
-            val_loss += loss.item()
-            # Get predictions
+            running_loss += loss.item()
             _, predicted = torch.max(outputs.data, 1)
-            # Update total and correct predictions
-            val_total += labels.size(0)
-            val_correct += (predicted == labels).sum().item()
 
-    # Calculate average validation loss and accuracy
-    val_loss /= len(val_loader)
-    val_acc = val_correct / val_total
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
 
-    # Print epoch results
-    print(f"Epoch {epoch+1}/{num_epochs}")
-    print(f"  Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
-    print(f"  Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
+        train_loss = running_loss / len(train_loader)
+        train_acc = correct / total
+
+        # Validation phase
+        model.eval()
+        val_loss = 0.0
+        val_correct = 0
+        val_total = 0
+
+        with torch.no_grad():
+            for inputs, labels in val_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+
+                val_loss += loss.item()
+                _, predicted = torch.max(outputs.data, 1)
+                val_total += labels.size(0)
+                val_correct += (predicted == labels).sum().item()
+
+        val_loss /= len(val_loader)
+        val_acc = val_correct / val_total
+
+        print(f"Epoch {epoch+1}/{num_epochs}")
+        print(f"  Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
+        print(f"  Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
+
+
+def make_model(learning_rate=0.01):
+    model = ClothingClassifierMobileNet(num_classes=10)
+    model.to(device)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    return model, optimizer
+
+
+learning_rates = [0.0001, 0.001, 0.01, 0.1]
+
+for lr in learning_rates:
+    print(f"\n=== Learning Rate: {lr} ===")
+    model, optimizer = make_model(learning_rate=lr)
+    train_and_evaluate(
+        model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+    )
