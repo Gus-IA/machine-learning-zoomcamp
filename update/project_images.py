@@ -177,7 +177,7 @@ import torchvision.models as models
 
 
 class ClothingClassifierMobileNet(nn.Module):
-    def __init__(self, num_classes=10):
+    def __init__(self, size_inner=100, num_classes=10):
         super(ClothingClassifierMobileNet, self).__init__()
 
         # Load pre-trained MobileNetV2
@@ -192,12 +192,17 @@ class ClothingClassifierMobileNet(nn.Module):
 
         # Add custom layers
         self.global_avg_pooling = nn.AdaptiveAvgPool2d((1, 1))
-        self.output_layer = nn.Linear(1280, num_classes)
+
+        self.inner = nn.Linear(1280, size_inner)
+        self.relu = nn.ReLU()
+        self.output_layer = nn.Linear(size_inner, num_classes)
 
     def forward(self, x):
         x = self.base_model.features(x)
         x = self.global_avg_pooling(x)
         x = torch.flatten(x, 1)
+        x = self.inner(x)
+        x = self.relu(x)
         x = self.output_layer(x)
         return x
 
