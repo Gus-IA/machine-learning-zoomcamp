@@ -225,6 +225,7 @@ num_epochs = 10
 def train_and_evaluate(
     model, optimizer, train_loader, val_loader, criterion, num_epochs, device
 ):
+    best_val_accuracy = 0.0  # Initialize variable to track the best validation accuracy
     for epoch in range(num_epochs):
         # Training phase
         model.train()
@@ -275,6 +276,12 @@ def train_and_evaluate(
         print(f"  Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
         print(f"  Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
 
+        if val_acc > best_val_accuracy:
+            best_val_accuracy = val_acc
+            checkpoint_path = f"mobilenet_v2_{epoch+1:02d}_{val_acc:.3f}.pth"
+            torch.save(model.state_dict(), checkpoint_path)
+            print(f"Checkpoint saved: {checkpoint_path}")
+
 
 def make_model(learning_rate=0.01):
     model = ClothingClassifierMobileNet(num_classes=10)
@@ -288,6 +295,24 @@ learning_rates = [0.0001, 0.001, 0.01, 0.1]
 for lr in learning_rates:
     print(f"\n=== Learning Rate: {lr} ===")
     model, optimizer = make_model(learning_rate=lr)
+    train_and_evaluate(
+        model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+    )
+
+
+def make_model(learning_rate=0.001, size_inner=100):
+    model = ClothingClassifierMobileNet(num_classes=10, size_inner=size_inner)
+    model.to(device)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    return model, optimizer
+
+
+for size_inner in [1000, 500, 100]:
+    print("size_inner =", size_inner)
+    model, optimizer = make_model(
+        learning_rate=0.001,
+        size_inner=size_inner,
+    )
     train_and_evaluate(
         model, optimizer, train_loader, val_loader, criterion, num_epochs, device
     )

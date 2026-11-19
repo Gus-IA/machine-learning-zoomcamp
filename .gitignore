@@ -210,3 +210,4 @@ __marimo__/
 *.csv
 clothing-dataset-small-master
 *.txt
+*.pth
