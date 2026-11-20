@@ -177,7 +177,7 @@ import torchvision.models as models
 
 
 class ClothingClassifierMobileNet(nn.Module):
-    def __init__(self, size_inner=100, num_classes=10):
+    def __init__(self, size_inner=100, droprate=0.2, num_classes=10):
         super(ClothingClassifierMobileNet, self).__init__()
 
         # Load pre-trained MobileNetV2
@@ -195,6 +195,7 @@ class ClothingClassifierMobileNet(nn.Module):
 
         self.inner = nn.Linear(1280, size_inner)
         self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(droprate)  # Add dropout
         self.output_layer = nn.Linear(size_inner, num_classes)
 
     def forward(self, x):
@@ -300,8 +301,10 @@ for lr in learning_rates:
     )
 
 
-def make_model(learning_rate=0.001, size_inner=100):
-    model = ClothingClassifierMobileNet(num_classes=10, size_inner=size_inner)
+def make_model(learning_rate=0.001, size_inner=100, droprate=0.2):
+    model = ClothingClassifierMobileNet(
+        num_classes=10, size_inner=size_inner, droprate=droprate
+    )
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     return model, optimizer
@@ -313,6 +316,17 @@ for size_inner in [1000, 500, 100]:
         learning_rate=0.001,
         size_inner=size_inner,
     )
+    train_and_evaluate(
+        model, optimizer, train_loader, val_loader, criterion, num_epochs, device
+    )
+
+for droprate in [0.1, 0.2, 0.5, 0.7]:
+    print("size_inner =", size_inner)
+
+    model, optimizer = make_model(
+        learning_rate=0.001, size_inner=100, droprate=droprate
+    )
+
     train_and_evaluate(
         model, optimizer, train_loader, val_loader, criterion, num_epochs, device
     )
