@@ -146,7 +146,9 @@ std = [0.229, 0.224, 0.225]
 # Simple transforms - just resize and normalize
 train_transforms = transforms.Compose(
     [
-        transforms.Resize((input_size, input_size)),
+        transforms.RandomRotation(10),  # Rotate up to 10 degrees
+        transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),  # Zoom
+        transforms.RandomHorizontalFlip(),  # Horizontal flip
         transforms.ToTensor(),
         transforms.Normalize(mean=mean, std=std),
     ]
@@ -279,7 +281,7 @@ def train_and_evaluate(
 
         if val_acc > best_val_accuracy:
             best_val_accuracy = val_acc
-            checkpoint_path = f"mobilenet_v2_{epoch+1:02d}_{val_acc:.3f}.pth"
+            checkpoint_path = f"mobilenet_v3_{epoch+1:02d}_{val_acc:.3f}.pth"
             torch.save(model.state_dict(), checkpoint_path)
             print(f"Checkpoint saved: {checkpoint_path}")
 
